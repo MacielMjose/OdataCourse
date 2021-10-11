@@ -3,3 +3,18 @@
 ################################################################################
 
 /AirVinyl.API/bin
+/AirVinyl.API/App_Data
+/AirVinyl.API/obj/Debug/AirVinyl.API.pdb
+/AirVinyl.API/obj/Debug/AirVinyl.API.dll
+/AirVinyl.API/obj/Debug/AirVinyl.API.csproj.FileListAbsolute.txt
+/AirVinyl.API/obj/Debug/AirVinyl.API.csproj.CoreCompileInputs.cache
+/AirVinyl.API/obj/Debug/AirVinyl.API.csproj.CopyComplete
+/AirVinyl.DataAccessLayer/bin/Debug
+/AirVinyl.DataAccessLayer/obj/Debug
+/AirVinyl.Model/bin/Debug
+/AirVinyl.Model/obj/Debug
+/packages/microsoft-web-helpers.1.0
+/packages/Microsoft.Web.Infrastructure.1.0.0.0/lib/net40/Microsoft.Web.Infrastructure.dll
+/packages/Microsoft.Web.Infrastructure.1.0.0.0/Microsoft.Web.Infrastructure.1.0.0.0.nupkg
+/packages/Microsoft.Web.Infrastructure.1.0.0.0/.signature.p7s
+/packages/Microsoft.Web.Infrastructure.1.0.0.0
