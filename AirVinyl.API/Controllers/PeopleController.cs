@@ -61,6 +61,26 @@ namespace AirVinyl.API.Controllers
             return this.CreateOKHttpActionResult(propertyValue);
         }
 
+        [HttpGet]
+        [ODataRoute("People({key})/Friends")]
+        [ODataRoute("People({key})/VinylRecords")]
+        public IHttpActionResult GetPersonColletionProperty([FromODataUri] int key)
+        {
+            var collectionPropertyToGet = Url.Request.RequestUri.Segments.Last();
+            var person = _ctx.People.Include(collectionPropertyToGet)
+                .FirstOrDefault(p => p.PersonId == key);
+
+            if (person == null)
+            {
+                return NotFound();
+            }
+
+            var collectionPropertyValue = person.GetValue(collectionPropertyToGet);
+
+            return this.CreateOKHttpActionResult(collectionPropertyValue);
+        }
+
+
         protected override void Dispose(bool disposing)
         {
             _ctx.Dispose();
