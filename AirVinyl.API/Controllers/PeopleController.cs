@@ -1,8 +1,7 @@
-﻿using AirVinyl.DataAccessLayer;
-using System;
-using System.Collections.Generic;
+﻿using AirVinyl.API.Helpers;
+using AirVinyl.DataAccessLayer;
 using System.Linq;
-using System.Web;
+using System.Net;
 using System.Web.Http;
 using System.Web.OData;
 using System.Web.OData.Routing;
@@ -29,6 +28,7 @@ namespace AirVinyl.API.Controllers
 
             return Ok(person);
         }
+
         [HttpGet]
         [ODataRoute("People({key})/Email")]
         [ODataRoute("People({key})/FirstName")]
@@ -46,7 +46,19 @@ namespace AirVinyl.API.Controllers
 
             var propertyToGet = Url.Request.RequestUri.Segments.Last();
 
-            return Ok();
+            if (!person.HasProperty(propertyToGet))
+            {
+                return NotFound();
+            }
+
+            var propertyValue = person.GetValue(propertyToGet);
+
+            if(propertyValue == null)
+            {
+                return StatusCode(HttpStatusCode.NoContent);
+            }
+
+            return this.CreateOKHttpActionResult(propertyValue);
         }
 
         protected override void Dispose(bool disposing)
