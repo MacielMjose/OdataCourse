@@ -1,5 +1,6 @@
 ﻿using AirVinyl.API.Helpers;
 using AirVinyl.DataAccessLayer;
+using AirVinyl.Model;
 using System.Linq;
 using System.Net;
 using System.Web.Http;
@@ -12,11 +13,13 @@ namespace AirVinyl.API.Controllers
     {
         private AirVinylDbContext _ctx = new AirVinylDbContext();
 
+        [EnableQuery]
         public IHttpActionResult Get()
         {
             return Ok(_ctx.People);
         }
 
+        [EnableQuery]
         public IHttpActionResult Get([FromODataUri]int key)
         {
             var person = _ctx.People.FirstOrDefault(p => p.PersonId == key);
@@ -80,6 +83,19 @@ namespace AirVinyl.API.Controllers
             return this.CreateOKHttpActionResult(collectionPropertyValue);
         }
 
+        [HttpPost]
+        public IHttpActionResult Post(Person person)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            _ctx.People.Add(person);
+            _ctx.SaveChanges();
+
+            return Created(person);
+        }
 
         protected override void Dispose(bool disposing)
         {
