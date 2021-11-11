@@ -97,6 +97,30 @@ namespace AirVinyl.API.Controllers
             return Created(person);
         }
 
+        [HttpPut]
+        public IHttpActionResult Put([FromODataUri]int key, Person person)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var currentPerson =_ctx.People.FirstOrDefault(c => c.PersonId == key);
+
+            if (currentPerson == null)
+            {
+                return NotFound();
+            }
+
+            person.PersonId = currentPerson.PersonId;
+
+            _ctx.Entry(currentPerson).CurrentValues.SetValues(person);
+            _ctx.SaveChanges();
+
+            return StatusCode(HttpStatusCode.NoContent);
+        }
+
+
         protected override void Dispose(bool disposing)
         {
             _ctx.Dispose();
