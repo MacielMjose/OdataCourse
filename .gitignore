@@ -3,6 +3,8 @@
 ################################################################################
 
 /AirVinyl.API/bin
+/AirVinyl.API/bin/Debug
+/AirVinyl.API/obj
 /AirVinyl.API/App_Data
 /AirVinyl.API/obj/Debug/AirVinyl.API.pdb
 /AirVinyl.API/obj/Debug/AirVinyl.API.dll
@@ -28,3 +30,5 @@
 /packages/Microsoft.AspNet.WebPages.Data.3.2.7
 /packages/Microsoft.AspNet.WebPages.WebData.3.2.7/lib/net45
 /packages/Microsoft.AspNet.WebPages.WebData.3.2.7
+
+*.cache
