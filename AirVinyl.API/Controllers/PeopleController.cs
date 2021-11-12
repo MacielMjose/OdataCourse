@@ -1,6 +1,7 @@
 ﻿using AirVinyl.API.Helpers;
 using AirVinyl.DataAccessLayer;
 using AirVinyl.Model;
+using System;
 using System.Linq;
 using System.Net;
 using System.Web.Http;
@@ -120,8 +121,7 @@ namespace AirVinyl.API.Controllers
             return StatusCode(HttpStatusCode.NoContent);
         }
 
-        [HttpPatch]
-        //must be the prefered mean to update
+        [HttpPatch]//must be the prefered mean to update
         public IHttpActionResult Patch([FromODataUri] int key, Delta<Person> patch)
         {
             if (!ModelState.IsValid)
@@ -137,6 +137,126 @@ namespace AirVinyl.API.Controllers
             }
 
             patch.Patch(currentPerson);
+            _ctx.SaveChanges();
+
+            return StatusCode(HttpStatusCode.NoContent);
+        }
+
+        [HttpDelete]
+        public IHttpActionResult Delete([FromODataUri] int key)
+        {
+            var currentPerson = _ctx.People.Include("Friends").FirstOrDefault(p => p.PersonId == key);
+
+            if(currentPerson == null)
+            {
+                return NotFound();
+            }
+
+            var peopleWithCurrentPersonAsFriend = _ctx.People.Include("Friends")
+                .Where(p => p.Friends.Select(f => f.PersonId).AsQueryable().Contains(key));
+
+            foreach (var person in peopleWithCurrentPersonAsFriend.ToList())
+            {
+                person.Friends.Remove(currentPerson);
+            }
+
+            _ctx.People.Remove(currentPerson);
+            _ctx.SaveChanges();
+
+            return StatusCode(HttpStatusCode.NoContent);
+        }
+
+        [HttpPost]
+        [ODataRoute("People({key})/Friends/$ref")]
+        public IHttpActionResult CreateLinkToFriend([FromODataUri]int key, [FromBody] Uri link)
+        {
+            var currentPerson = _ctx.People.Include("Friends").FirstOrDefault(p => p.PersonId == key);
+            
+            if(currentPerson == null)
+            {
+                return NotFound();
+            }
+
+            int keyOfFriendToAdd = Request.GetKeyValue<int>(link);
+
+            if(currentPerson.Friends.Any(p => p.PersonId == keyOfFriendToAdd))
+            {
+                return BadRequest(string.Format("the person with id {0} is already linked to the person with id {1}", key, keyOfFriendToAdd));
+            }
+
+            var friendToLinkTo = _ctx.People.FirstOrDefault(p => p.PersonId == keyOfFriendToAdd);
+
+            if(friendToLinkTo == null)
+            {
+                return NotFound();
+            }
+
+            currentPerson.Friends.Add(friendToLinkTo);
+            _ctx.SaveChanges();
+
+            return StatusCode(HttpStatusCode.NoContent);
+        }
+
+        [HttpPut]
+        [ODataRoute("People({key})/Friends({relatedKey})/$ref")]
+        public IHttpActionResult UpdateLinkToFriend([FromODataUri] int key, [FromODataUri] int relatedKey,
+            [FromBody] Uri link)
+        {
+            var currentePerson = _ctx.People.Include("Friends").FirstOrDefault(p => p.PersonId == key);
+
+            if(currentePerson == null)
+            {
+                return NotFound();
+            }
+
+            var currentFriend = _ctx.People.FirstOrDefault(f => f.PersonId == relatedKey);
+
+            if(currentFriend == null)
+            {
+                return NotFound();
+            }
+
+            int keyOfFriendToAdd = Request.GetKeyValue<int>(link);
+
+            if (currentePerson.Friends.Any(p => p.PersonId == keyOfFriendToAdd))
+            {
+                return BadRequest(
+                    string.Format("the person with id {0} is already linked to the person with id {1}", key, keyOfFriendToAdd));
+            }
+
+            var friendToLinkTo = _ctx.People.FirstOrDefault(p => p.PersonId == keyOfFriendToAdd);
+
+            if(friendToLinkTo == null)
+            {
+                return NotFound();
+            }
+
+            currentePerson.Friends.Remove(currentFriend);
+            currentePerson.Friends.Add(friendToLinkTo);
+            _ctx.SaveChanges();
+
+            return StatusCode(HttpStatusCode.NoContent);
+        }
+
+        [HttpDelete]
+        [ODataRoute("People({key})/Friends({relatedKey})/$ref")]
+        public IHttpActionResult DeleteLinkToFriend([FromODataUri] int key, [FromODataUri] int relatedKey)
+        {
+            var currentPerson = _ctx.People.Include("Friends").FirstOrDefault(p => p.PersonId == key);
+
+            if (currentPerson == null)
+            {
+                return NotFound();
+            }
+
+            var friend = currentPerson.Friends.FirstOrDefault(f => f.PersonId == relatedKey);
+
+            if (friend == null)
+            {
+                return NotFound();
+            }
+
+            currentPerson.Friends.Remove(friend);
             _ctx.SaveChanges();
 
             return StatusCode(HttpStatusCode.NoContent);
