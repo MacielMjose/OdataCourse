@@ -149,7 +149,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="App_Data\" />
     <Folder Include="Helpers\" />
     <Folder Include="Models\" />
   </ItemGroup>
