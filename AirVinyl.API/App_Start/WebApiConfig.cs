@@ -25,6 +25,7 @@ namespace AirVinyl.API
 
             builder.EntitySet<Person>("People");
             builder.EntitySet<VinylRecord>("VinylRecords");
+            builder.EntitySet<RecordStore>("RecordStores");
 
             return builder.GetEdmModel();
         }
