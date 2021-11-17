@@ -133,6 +133,7 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\PeopleController.cs" />
     <Compile Include="Controllers\RecordsStoresController.cs" />
+    <Compile Include="Controllers\SingletonController.cs" />
     <Compile Include="Extensions\ODataHelpers.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>

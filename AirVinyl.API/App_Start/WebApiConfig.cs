@@ -27,6 +27,26 @@ namespace AirVinyl.API
             //builder.EntitySet<VinylRecord>("VinylRecords"); Contained in person only
             builder.EntitySet<RecordStore>("RecordStores");
 
+            //Actions - can have side effects
+
+            var rateAction = builder.EntityType<RecordStore>().Action("Rate");
+            rateAction.Returns<bool>();
+            rateAction.Parameter<int>("rating");
+            rateAction.Parameter<int>("personId");
+            rateAction.Namespace = "AirVinyl.Actions";
+
+            var removeRatingAction = builder.EntityType<RecordStore>().Collection.Action("RemoveRatings");
+            removeRatingAction.Returns<bool>();
+            removeRatingAction.Parameter<int>("personId");
+            removeRatingAction.Namespace = "AirVinyl.Actions";
+
+            var removeRecordStoreRatingsAction = builder.Action("RemoveRecordStoreRatings");
+            removeRecordStoreRatingsAction.Parameter<int>("personId");
+            removeRatingAction.Namespace = "AirVinyl.Actions";
+
+            //singletons - Tim
+            builder.Singleton<Person>("Tim");
+
             return builder.GetEdmModel();
         }
     }

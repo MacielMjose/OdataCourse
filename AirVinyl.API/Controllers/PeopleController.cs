@@ -57,6 +57,103 @@ namespace AirVinyl.API.Controllers
             return Ok(SingleResult.Create(vinylRecords));
         }
 
+        [HttpPost]
+        [ODataRoute("People({key})/VinylRecords")]
+        public IHttpActionResult PostVinylRecordForPerson([FromODataUri] int key, VinylRecord vinylRecord)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            //does the person exists?
+            var person = _ctx.People.FirstOrDefault(p => p.PersonId == key);
+
+            if (person == null)
+            {
+                return NotFound();
+            }
+
+            //link the person to the VinylRecord(also avoids an invalid person)
+            //key on the passed in record key from the URI wins
+            vinylRecord.Person = person;
+
+            //add the vinyl record
+            _ctx.VinylRecords.Add(vinylRecord);
+            _ctx.SaveChanges();
+
+            //return the created VinylRecord
+            return Created(vinylRecord);
+        }
+
+        [HttpPatch]
+        [ODataRoute("People({key})/VinylRecords({vinylRecordKey})")]
+        public IHttpActionResult PatchVinylRecordForPerson([FromODataUri] int key,[FromODataUri] int vinylRecordKey
+            ,Delta<VinylRecord> patch)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            //does the person exists?
+            var person = _ctx.People.FirstOrDefault(p => p.PersonId == key);
+
+            if (person == null)
+            {
+                return NotFound();
+            }
+
+            //find matchin vinyl record
+            var currentVinylRecord = _ctx.VinylRecords.FirstOrDefault(v => v.VinylRecordId == vinylRecordKey
+            && v.Person.PersonId == key);
+
+            //return NotFound if the vinylRecord is not found
+            if(currentVinylRecord == null)
+            {
+                return NotFound();
+            }
+
+            //apply patch
+            patch.Patch(currentVinylRecord);
+            _ctx.SaveChanges();
+          
+            //return the created VinylRecord
+            return StatusCode(HttpStatusCode.NoContent);
+        }
+
+
+        [HttpDelete]
+        [ODataRoute("People({key})/VinylRecords({vinylRecordKey})")]
+        public IHttpActionResult DeleteVinylRecordForPerson([FromODataUri] int key, [FromODataUri] int vinylRecordKey)
+        {
+
+            //does the person exists?
+            var person = _ctx.People.FirstOrDefault(p => p.PersonId == key);
+
+            if (person == null)
+            {
+                return NotFound();
+            }
+
+            //find matchin vinyl record
+            var currentVinylRecord = _ctx.VinylRecords.FirstOrDefault(v => v.VinylRecordId == vinylRecordKey
+            && v.Person.PersonId == key);
+
+            //return NotFound if the vinylRecord is not found
+            if (currentVinylRecord == null)
+            {
+                return NotFound();
+            }
+
+            //apply patch
+            _ctx.VinylRecords.Remove(currentVinylRecord);
+            _ctx.SaveChanges();
+
+            //return the created VinylRecord
+            return StatusCode(HttpStatusCode.NoContent);
+        }
+
 
         [HttpGet]
         [ODataRoute("People({key})/Email")]
