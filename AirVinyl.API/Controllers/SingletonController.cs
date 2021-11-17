@@ -1,5 +1,6 @@
 ﻿using AirVinyl.API.Helpers;
 using AirVinyl.DataAccessLayer;
+using AirVinyl.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -74,6 +75,25 @@ namespace AirVinyl.API.Controllers
 
             return this.CreateOKHttpActionResult(collectionPropertyValue);
         }
+
+        [HttpPatch]//must be the prefered mean to update
+        [ODataRoute("Tim")]
+        public IHttpActionResult Patch(Delta<Person> patch)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            //find tim
+            var currentPerson = _ctx.People.FirstOrDefault(c => c.PersonId == 6);
+
+            patch.Patch(currentPerson);
+            _ctx.SaveChanges();
+
+            return StatusCode(HttpStatusCode.NoContent);
+        }
+
 
         protected override void Dispose(bool disposing)
         {
