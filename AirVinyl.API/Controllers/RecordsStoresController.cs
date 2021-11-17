@@ -1,5 +1,6 @@
 ﻿using AirVinyl.API.Helpers;
 using AirVinyl.DataAccessLayer;
+using AirVinyl.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -35,8 +36,34 @@ namespace AirVinyl.API.Controllers
         }
 
         [HttpGet]
-        [ODataRoute("RecordStores({key})/Tags")]
         [EnableQuery]
+        [ODataRoute("RecordStores/AirVinyl.Model.SpecializedRecordStore")]
+        public IHttpActionResult GetSpecializedSores()
+        {
+            var specializedSotres = _ctx.RecordStores.Where(r => r is SpecializedRecordStore);
+
+            return Ok(specializedSotres.Select(s => s as SpecializedRecordStore));
+        }
+
+        [HttpGet]
+        [EnableQuery]
+        [ODataRoute("RecordStores({key})/AirVinyl.Model.SpecializedRecordStore")]
+        public IHttpActionResult GetSpecializedSore([FromODataUri] int key)
+        {
+            var specializedSotres = _ctx.RecordStores
+                .Where(r => r is SpecializedRecordStore && r.RecordStoreId == key);
+
+            if (!specializedSotres.Any())
+            {
+                return NotFound();
+            }
+
+            return Ok(SingleResult.Create(specializedSotres.Select(s => s as SpecializedRecordStore)));
+        }
+
+        [HttpGet]
+        [EnableQuery]
+        [ODataRoute("RecordStores({key})/Tags")]
         public IHttpActionResult GetPersonProperty([FromODataUri] int key)
         {
             var recordstore = _ctx.RecordStores.FirstOrDefault(p => p.RecordStoreId == key);
@@ -61,6 +88,23 @@ namespace AirVinyl.API.Controllers
             }
 
             return this.CreateOKHttpActionResult(propertyValue);
+        }
+
+        [HttpPost]
+        [ODataRoute("RecordStores")] //to pass child class use "@odata.type":"#AirVinyl.Model.SpecializedRecordStore",
+        public IHttpActionResult CreateRecordStore(RecordStore store)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            //add the recordstore
+            _ctx.RecordStores.Add(store);
+            _ctx.SaveChanges();
+
+            //return the created store
+            return Created(store);
         }
 
         [HttpPost]
@@ -222,6 +266,56 @@ namespace AirVinyl.API.Controllers
                 //something went wrong - return internal server error
                 return StatusCode(HttpStatusCode.InternalServerError);
             }
+        }
+
+        [HttpPatch]
+        [ODataRoute("RecordStores({key})")]
+        [ODataRoute("RecordStores({key})/AirVinyl.Model.SpecializedRecordStore")]
+        public IHttpActionResult PatchRecordStore([FromODataUri] int key, Delta<RecordStore> patch)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            //find matchin recordStore
+            var currentRecordStore = _ctx.RecordStores.FirstOrDefault(v => v.RecordStoreId == key);
+
+            //return NotFound if the recordStore is not found
+            if (currentRecordStore == null)
+            {
+                return NotFound();
+            }
+
+            //apply patch
+            patch.Patch(currentRecordStore);
+            _ctx.SaveChanges();
+
+            //return noContent
+            return StatusCode(HttpStatusCode.NoContent);
+        }
+
+        [HttpDelete]
+        [ODataRoute("RecordStores({key})")]
+        [ODataRoute("RecordStores({key})/AirVinyl.Model.SpecializedRecordStore")]
+        public IHttpActionResult DeleteVinylRecordForPerson([FromODataUri] int key)
+        {
+            //does the recordStore exists?
+            var recordStore = _ctx.RecordStores.Include("Ratings")
+                .FirstOrDefault(p => p.RecordStoreId == key);
+
+            if (recordStore == null)
+            {
+                return NotFound();
+            }
+
+            //apply delete
+            recordStore.Ratings.Clear();
+            _ctx.RecordStores.Remove(recordStore);
+            _ctx.SaveChanges();
+
+            //return no content
+            return StatusCode(HttpStatusCode.NoContent);
         }
 
         protected override void Dispose(bool disposing)
