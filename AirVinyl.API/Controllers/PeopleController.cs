@@ -36,6 +36,23 @@ namespace AirVinyl.API.Controllers
 
         [HttpGet]
         [EnableQuery]
+        [ODataRoute("People({key})/VinylRecords")]
+        public IHttpActionResult GetVinylRecordForPerson([FromODataUri] int key)
+        {
+            var person = _ctx.People.FirstOrDefault(p => p.PersonId == key);
+
+            if (person == null)
+            {
+                return NotFound();
+            }
+
+            //Return the collection
+            return Ok(_ctx.VinylRecords.Include("DynamicVinylRecordProperties")
+                .Where(v => v.Person.PersonId == key));
+        }
+
+        [HttpGet]
+        [EnableQuery]
         [ODataRoute("People({key})/VinylRecords({vinylRecordKey})")]
         public IHttpActionResult GetVinylRecordForPerson([FromODataUri] int key, int vinylRecordKey)
         {
@@ -106,8 +123,8 @@ namespace AirVinyl.API.Controllers
             }
 
             //find matchin vinyl record
-            var currentVinylRecord = _ctx.VinylRecords.FirstOrDefault(v => v.VinylRecordId == vinylRecordKey
-            && v.Person.PersonId == key);
+            var currentVinylRecord = _ctx.VinylRecords.Include("DynamicVinylRecordProperties")
+                .FirstOrDefault(v => v.VinylRecordId == vinylRecordKey && v.Person.PersonId == key);
 
             //return NotFound if the vinylRecord is not found
             if(currentVinylRecord == null)
