@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace AirVinyl.Model
 {
@@ -23,5 +24,37 @@ namespace AirVinyl.Model
         public PressingDetail PressingDetail { get; set; }
 
         public virtual Person Person { get; set; }
+
+        private IDictionary<string, object> _properties;
+        
+        public IDictionary<string, object> Properties
+        {
+            get
+            {
+                //return _properties;
+                //create dictionaryh from DyhnamicVinylProperties
+                if(_properties == null)
+                {
+                    _properties = new Dictionary<string, object>();
+                    
+                    foreach (var dynamicProp in DynamicVinylRecordProperties)
+                    {
+                        _properties.Add(dynamicProp.Key, dynamicProp.Value);
+                    }
+                }
+                return _properties;
+            }
+            set
+            {
+                _properties = value;
+            }
+        }
+
+        public ICollection<DynamicProperty> DynamicVinylRecordProperties { get; set; }
+
+        public VinylRecord()
+        {
+            DynamicVinylRecordProperties = new List<DynamicProperty>();
+        }
     }
 }

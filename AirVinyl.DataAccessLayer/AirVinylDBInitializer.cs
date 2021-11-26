@@ -145,7 +145,11 @@ namespace AirVinyl.DataAccessLayer
                     Title = "AM",
                     CatalogNumber = "EUI/111",
                     PressingDetail = pressingDetailAudiophileLP,
-                    Year = 2013
+                    Year = 2013,
+                    DynamicVinylRecordProperties = new List<DynamicProperty>()
+                    {
+                        new DynamicProperty(){Key = "Publisher", Value = "Geffen"}
+                    }
                 },
                 new VinylRecord()
                 {

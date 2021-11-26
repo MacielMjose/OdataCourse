@@ -29,8 +29,9 @@ namespace AirVinyl.API.Controllers
             {
                 return NotFound();
             }
-
-            return Ok(person);
+            //return the collection
+            return Ok(_ctx.VinylRecords.Include("DynamicVinylRecordProperties")
+                .Where(v => v.Person.PersonId == key));
         }
 
         [HttpGet]
@@ -45,9 +46,9 @@ namespace AirVinyl.API.Controllers
                 return NotFound();
             }
 
-            //Queryable not first or default
-            var vinylRecords = _ctx.VinylRecords.Where(v => v.Person.PersonId == key 
-            && v.VinylRecordId == vinylRecordKey);
+            //Queryable, no first or default
+            var vinylRecords = _ctx.VinylRecords.Include("DynamicVinylRecordProperties")
+                .Where(v => v.Person.PersonId == key && v.VinylRecordId == vinylRecordKey);
 
             if (!vinylRecords.Any())
             {
