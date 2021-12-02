@@ -14,7 +14,7 @@ namespace AirVinyl.API.Controllers
     {
         private AirVinylDbContext _ctx = new AirVinylDbContext();
 
-        [EnableQuery]
+        [EnableQuery(PageSize = 5)]
         public IHttpActionResult Get()
         {
             return Ok(_ctx.People);
@@ -32,6 +32,22 @@ namespace AirVinyl.API.Controllers
             //return the collection
             return Ok(_ctx.VinylRecords.Include("DynamicVinylRecordProperties")
                 .Where(v => v.Person.PersonId == key));
+        }
+
+        [HttpGet]
+        [EnableQuery]
+        [ODataRoute("People({key})")]
+        public IHttpActionResult GetPersonSingle([FromODataUri] int key)
+        {
+            var person = _ctx.People.FirstOrDefault(p => p.PersonId == key);
+
+            if (person == null)
+            {
+                return NotFound();
+            }
+
+            //Return the collection
+            return Ok(person);
         }
 
         [HttpGet]

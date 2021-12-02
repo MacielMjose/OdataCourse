@@ -77,3 +77,8 @@
 /packages/Microsoft.AspNet.WebApi.Client.5.2.2/.signature.p7s
 /packages/Microsoft.AspNet.WebApi.Client.5.2.2
 /AirVinyl.Model/packages.config
+/AirVinyl.WebClient/bin
+/AirVinyl.WebClient/obj/Debug
+/packages
+/vs
+/AirVinyl.WebClient/AirVinyl.WebClient.csproj.user
