@@ -16,7 +16,7 @@ namespace AirVinyl.WebClient
             routes.MapRoute(
                 name: "Default",
                 url: "{controller}/{action}/{id}",
-                defaults: new { controller = "AirVinyl", action = "Index", id = UrlParameter.Optional }
+                defaults: new { controller = "AirVinylJavascriptController", action = "Index", id = UrlParameter.Optional }
             );
         }
     }

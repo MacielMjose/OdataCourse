@@ -5,11 +5,13 @@ using System;
 using System.Linq;
 using System.Net;
 using System.Web.Http;
+using System.Web.Http.Cors;
 using System.Web.OData;
 using System.Web.OData.Routing;
 
 namespace AirVinyl.API.Controllers
 {
+    [EnableCors(origins: "https://localhost:44315", headers: "*", methods:"*")]
     public class PeopleController : ODataController
     {
         private AirVinylDbContext _ctx = new AirVinylDbContext();

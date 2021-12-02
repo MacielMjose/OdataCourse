@@ -17,6 +17,7 @@ namespace AirVinyl.API
             
             config.MapODataServiceRoute("ODataRoute", "odata", GetEdmModel()
                 ,new DefaultODataBatchHandler(GlobalConfiguration.DefaultServer));
+            config.EnableCors();
             config.EnsureInitialized();
         }
 
